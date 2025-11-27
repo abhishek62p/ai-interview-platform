@@ -29,15 +29,35 @@ export async function handleLoginUser(
       };
     }
 
-    const result = await signIn("credentials", {
-      email: userData.email,
-      password: userData.password,
-      role: roleUpper,
-      redirect: false,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email: userData.email,
+        password: userData.password,
+        role: roleUpper,
+        redirect: false,
+      });
 
-    // Check if sign-in failed
-    if (result?.error) {
+      // Check if sign-in failed
+      if (result?.error) {
+        console.error("Sign-in error:", result.error);
+        return {
+          success: false,
+          errors: {
+            general: "Invalid email, password, or role",
+          },
+        };
+      }
+
+      // If we reach here, authentication succeeded
+      redirect("/dashboard");
+    } catch (signInErr: any) {
+      // Check if it's a redirect error (which means success)
+      if (signInErr?.digest?.includes('NEXT_REDIRECT')) {
+        throw signInErr; // Re-throw to allow the redirect
+      }
+      
+      // Handle any auth-related errors (CallbackRouteError, etc.)
+      console.error("SignIn threw error:", signInErr);
       return {
         success: false,
         errors: {
@@ -45,9 +65,6 @@ export async function handleLoginUser(
         },
       };
     }
-
-    // If we reach here, authentication succeeded
-    redirect("/dashboard");
   } catch (err) {
     console.error("Login error:", err);
     
@@ -67,17 +84,6 @@ export async function handleLoginUser(
         success: false,
         errors: fieldErrors,
       };
-    } else if (err instanceof AuthError) {
-      switch (err.type) {
-        case "CredentialsSignin":
-          // Could be wrong password or role mismatch; return generic message
-          return {
-            success: false,
-            errors: {
-              general: "Invalid email, password, or role",
-            },
-          };
-      }
     }
   }
   return {
@@ -125,9 +131,36 @@ export async function handleSignUpUser(
 
     await CreateNewUser({ ...userData, role: roleUpper });
 
+    // Automatically sign in the user after successful signup
+    try {
+      const result = await signIn("credentials", {
+        email: userData.email,
+        password: userData.password,
+        role: roleUpper,
+        redirect: false,
+      });
+
+      if (!result?.error) {
+        redirect("/dashboard");
+      }
+    } catch (redirectErr) {
+      // Check if it's a redirect error (which means success)
+      if ((redirectErr as any)?.digest?.includes('NEXT_REDIRECT')) {
+        throw redirectErr; // Re-throw to allow the redirect
+      }
+      // If auto-login fails, still show success message
+      console.error("Auto-login after signup failed:", redirectErr);
+    }
+
     return { success: true };
   } catch (err) {
     console.error("Signup error:", err);
+    
+    // Check if it's a redirect error (which means success)
+    if ((err as any)?.digest?.includes('NEXT_REDIRECT')) {
+      throw err; // Re-throw to allow the redirect
+    }
+    
     if (err instanceof z.ZodError) {
       const fieldErrors: Record<string, string> = {};
 

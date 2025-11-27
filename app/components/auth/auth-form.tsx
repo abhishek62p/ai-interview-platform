@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useActionState, useEffect, useState } from 'react';
+import React, { useActionState, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { handleLoginUser, handleSignUpUser } from '@/app/(auth-pages)/lib/form-actions';
 import SocialAccount from '@/app/(auth-pages)/social/page';
 import { Label } from '../ui/label';
@@ -32,15 +31,10 @@ const initialFormState: FormState = {
 
 const AuthForm = (props: AuthFormProps) => {
 
-    const router = useRouter();
     const [role, setRole] = useState<string>('CANDIDATE');
 
     const actionFn = props.type === 'LOGIN' ? handleLoginUser : handleSignUpUser;
     const [state, formAction, pending] = useActionState(actionFn, initialFormState);
-
-    useEffect(() => {
-        if (state.success) router.push("/");
-    }, [state.success])
 
     return (
         <div className='flex gap-3 flex-col'>
