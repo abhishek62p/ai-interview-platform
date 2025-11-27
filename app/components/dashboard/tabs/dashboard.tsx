@@ -31,30 +31,36 @@ const DashboardTab = async () => {
 
   // For candidates, show existing dashboard
   let Data = null;
-  if (user != null) {
-    Data = await prisma.user.findFirst({
-      where: {
-        id: user?.user?.id
-      },
-      include: {
-        interviews: true,
-        feedBack: true
-      }
-    });
+  try {
+    if (user?.user?.id) {
+      Data = await prisma.user.findFirst({
+        where: {
+          id: user.user.id
+        },
+        include: {
+          interviews: true,
+          feedBack: true
+        }
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    // Data will remain null, and we'll use default values
   }
 
   const totalInterViews: number = Data?.interviews?.length ?? 0;
-  const completedInterViews: number = Data?.interviews.filter((x) => x.isCompleted == true).length ?? 0;
-  const inProgressInterViews: number = Data?.interviews.filter((x) => x.isCompleted != true).length ?? 0;
+  const completedInterViews: number = Data?.interviews?.filter((x) => x.isCompleted == true).length ?? 0;
+  const inProgressInterViews: number = Data?.interviews?.filter((x) => x.isCompleted != true).length ?? 0;
 
-
+  // Safely calculate chart data with fallbacks
+  const feedbackData = Data?.feedBack ?? [];
   const chartData = [
-    { type: "Problem Solving", value: Data?.feedBack.reduce((a, b) => a + b.problemSolving, 0) },
-    { type: "System Design", value: Data?.feedBack.reduce((a, b) => a + b.systemDesign, 0) },
-    { type: "Communication Skills", value: Data?.feedBack.reduce((a, b) => a + b.communicationSkills, 0) },
-    { type: "Technical Accuracy", value: Data?.feedBack.reduce((a, b) => a + b.technicalAccuracy, 0) },
-    { type: "Behavioral Responses", value: Data?.feedBack.reduce((a, b) => a + b.behavioralResponses, 0) },
-    { type: "Time Management", value: Data?.feedBack.reduce((a, b) => a + b.timeManagement, 0) },
+    { type: "Problem Solving", value: feedbackData.length > 0 ? feedbackData.reduce((a, b) => a + b.problemSolving, 0) : 0 },
+    { type: "System Design", value: feedbackData.length > 0 ? feedbackData.reduce((a, b) => a + b.systemDesign, 0) : 0 },
+    { type: "Communication Skills", value: feedbackData.length > 0 ? feedbackData.reduce((a, b) => a + b.communicationSkills, 0) : 0 },
+    { type: "Technical Accuracy", value: feedbackData.length > 0 ? feedbackData.reduce((a, b) => a + b.technicalAccuracy, 0) : 0 },
+    { type: "Behavioral Responses", value: feedbackData.length > 0 ? feedbackData.reduce((a, b) => a + b.behavioralResponses, 0) : 0 },
+    { type: "Time Management", value: feedbackData.length > 0 ? feedbackData.reduce((a, b) => a + b.timeManagement, 0) : 0 },
   ]
 
   return (

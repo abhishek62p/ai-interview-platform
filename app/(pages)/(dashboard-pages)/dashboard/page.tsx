@@ -8,10 +8,17 @@ import HRUsersTab from "@/app/components/dashboard/tabs/hr-users";
 import HRReportsTab from "@/app/components/dashboard/tabs/hr-reports";
 import HrScheduleInterview from "@/app/components/dashboard/tabs/hr-schedule-interview";
 import { auth } from "@/app/(auth-pages)/auth";
+import { redirect } from "next/navigation";
 
 const page = async () => {
   const session = await auth();
-  const isHR = session?.user?.role === "HR";
+  
+  // If no session, redirect to login
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  const isHR = session.user.role === "HR";
 
   return (
     <div className=" z-50">
