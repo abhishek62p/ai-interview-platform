@@ -6,7 +6,9 @@ const path = ["/interview", /^\/interview\/.*$/, "/dashboard"];
 export function middleware(request: NextRequest) {
   const pathName = request.nextUrl.pathname;
   if (path.includes(pathName)) {
-    const token = request.cookies.get("authjs.session-token");
+    // Check for both secure (production) and non-secure (local) cookie names
+    const token = request.cookies.get("__Secure-authjs.session-token") || 
+                  request.cookies.get("authjs.session-token");
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.nextUrl));
     }
