@@ -1,0 +1,19 @@
+# Docker E2E testing
+.dockerignore
+Dockerfile
+# Git
+.git
+.gitignore
+# Node
+node_modules
+npm-debug.log
+# VS Code
+.vscode
+# Next.js
+.next
+# Turborepo
+.turbo
+# Other
+.idea
+*.iml
+README.md
