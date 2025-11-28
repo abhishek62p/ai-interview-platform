@@ -37,8 +37,9 @@ export async function handleCreateInterviewFormAction(
     };
     await CreateInterviewSchema.parseAsync(data);
 
+    const base = process.env.NEXT_PUBLIC_BASE_URL || ""; // fallback to relative
     const createInterviewRes = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/interview/create`,
+      `${base}/api/interview/create`,
       {
         method: "POST",
         headers: {

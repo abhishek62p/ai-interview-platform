@@ -3,6 +3,12 @@ import {google} from "@ai-sdk/google";
 
 
 export async function POST (req:Request) {
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+        return Response.json(
+            { success: false, error: "Missing GOOGLE_GENERATIVE_AI_API_KEY in .env" },
+            { status: 500 }
+        );
+    }
     const { type, role, level, techstack, amount, userid } = await req.json();
     try {
         const { text: questions } = await generateText({

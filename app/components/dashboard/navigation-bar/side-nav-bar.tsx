@@ -10,8 +10,8 @@ import { Dispatch, SetStateAction } from "react";
 
 const candidateTabitems = [
     { value: "Dashboard", key: "dashboard" },        
-    { value: "Mock Interviews", key: "mock_interviews" },  
-    { value: "Create Interview", key: "create_interview" }, 
+    { value: "Interview", key: "mock_interviews" },  
+    { value: "Create Mock Interview", key: "create_interview" }, 
     { value: "Interview History", key: "interview_history" }, 
 ];
 

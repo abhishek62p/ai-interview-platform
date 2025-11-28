@@ -3,12 +3,24 @@ import type { NextRequest } from "next/server";
 
 const path = ["/interview", /^\/interview\/.*$/, "/dashboard"];
 
+function isPathProtected(
+  pathname: string,
+  protectedPaths: (string | RegExp)[]
+): boolean {
+  for (const p of protectedPaths) {
+    if (typeof p === "string" && p === pathname) return true;
+    if (p instanceof RegExp && p.test(pathname)) return true;
+  }
+  return false;
+}
+
 export function middleware(request: NextRequest) {
   const pathName = request.nextUrl.pathname;
-  if (path.includes(pathName)) {
+  if (isPathProtected(pathName, path)) {
     // Check for both secure (production) and non-secure (local) cookie names
-    const token = request.cookies.get("__Secure-authjs.session-token") || 
-                  request.cookies.get("authjs.session-token");
+    const token =
+      request.cookies.get("__Secure-authjs.session-token") ||
+      request.cookies.get("authjs.session-token");
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.nextUrl));
     }

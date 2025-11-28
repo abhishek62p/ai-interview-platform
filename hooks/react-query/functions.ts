@@ -6,15 +6,18 @@ type interviewsType = {
   role: string;
   difficultyLevel: string;
   isCompleted: boolean | null;
+  userId?: string;
 }[];
 
 export const FetchMockInterviews = async () => {
-  const res = await fetch(`/api/interview/getall`);
+  // Fetch all mock interviews (created by anyone)
+  const res = await fetch(`/api/interview/get-all-mock`);
   const data: interviewsType = await res.json();
   return data.filter((x) => !x.isCompleted);
 };
 
 export const FetchInterviewHistory = async () => {
+  // Fetch only user's own interviews (completed)
   const res = await fetch(`/api/interview/getall`);
   const data: interviewsType = await res.json();
   return data.filter((x) => x.isCompleted);

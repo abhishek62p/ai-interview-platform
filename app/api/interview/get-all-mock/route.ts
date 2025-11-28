@@ -12,9 +12,9 @@ export async function GET(req: NextRequest) {
   try {
     const now = new Date();
     
+    // Fetch all mock interviews created by anyone, not filtered by userId
     const interviews = await prisma.interview.findMany({
       where: {
-        userId: userId, // Filter by logged-in user
         OR: [
           // Non-scheduled interviews (everyone can access)
           { isScheduled: false },
@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
         scheduledAt: true,
         expiresAt: true,
         scheduledFor: true,
+        userId: true,
       },
     });
 

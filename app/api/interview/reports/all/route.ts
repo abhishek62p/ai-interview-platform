@@ -5,9 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const session = await auth();
   const userRole = session?.user?.role;
+  const userId = session?.user?.id;
 
   // Only HR can access this endpoint
-  if (!session || userRole !== "HR") {
+  if (!session || userRole !== "HR" || !userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
@@ -15,6 +16,8 @@ export async function GET(req: NextRequest) {
     const interviews = await prisma.interview.findMany({
       where: {
         isCompleted: true,
+        isScheduled: true,
+        scheduledBy: userId, // Only show interviews scheduled by this HR
       },
       select: {
         id: true,
@@ -47,7 +50,13 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(interviews);
+    // Map createdAt to updatedAt for compatibility
+    const formattedInterviews = interviews.map(interview => ({
+      ...interview,
+      updatedAt: interview.createdAt
+    }));
+
+    return NextResponse.json(formattedInterviews);
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch reports" },

@@ -201,7 +201,7 @@ export const columns: ColumnDef<MockInterviewType>[] = [
                     <Link
                         href={'/interview/' + row.getValue("id")} className="h-[38px] flex cursor-pointer py-4 px-4 rounded-full bg-[#1d243c] text-sm font-semibold text-center text-white hover:bg-black transition-colors duration-200">
                         <span className=" relative flex items-center gap-2">
-                            <span>Take Interview</span>
+                            <span>Start Interview</span>
                             <span className="relative flex items-center size-3">
                                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-200 opacity-75"></span>
                                 <span className="relative inline-flex size-3 rounded-full bg-sky-400"></span>

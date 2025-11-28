@@ -3,7 +3,7 @@
 import React, {useEffect} from 'react';
 import Image from "next/image";
 import {Button} from "@/app/components/ui/button";
-import {vapi} from "@/app/lib/vapi.sdk";
+import { toast } from "sonner";
 
 
 interface SavedMessage {
@@ -17,48 +17,12 @@ const Interview = () => {
     const [savedMessage, setsavedMessage] = React.useState<SavedMessage[]>([]);
     const [lastMessage, setLastMessage] = React.useState("");
 
-    useEffect(() => {
-        setCallStart(false);
-        setsavedMessage([]);
-
-        const onMessage = (message: any) => {
-            if (message.type === "transcript" && message.transcriptType === "final") {
-                const newMessage = {role: message.role, content: message.transcript};
-                setsavedMessage((prev) => [...prev, newMessage]);
-            }
-        };
-
-        const onSpeechStart = () => setIsSpeaking(true);
-        const onSpeechEnd = () => setIsSpeaking(false);
-
-        const onCallStart = () => setCallStart(true);
-        const onCallEnd = () => setCallStart(false);
-
-        vapi.on('message', onMessage);
-        vapi.on('speech-start', onSpeechStart);
-        vapi.on('speech-end', onSpeechEnd);
-        vapi.on('call-start', onCallStart);
-        vapi.on('call-end', onCallEnd);
-
-        return () => {
-            vapi.off('message', onMessage);
-            vapi.off('speech-start', onSpeechStart);
-            vapi.off('speech-end', onSpeechEnd);
-            vapi.off('call-start', onCallStart);
-            vapi.off('call-end', onCallEnd);
-        }
-    }, [])
-
     const handleCallConnect = async () => {
-        if (!process.env.NEXT_PUBLIC_VAPI_ASSISTANT_WORKFLOW_ID)
-            console.error('no workflow id found');
-    
-        await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_WORKFLOW_ID);
+        toast.error("This feature is not implemented yet.", { duration: 3500 });
     }
 
     const handleCallStop = () => {
         setCallStart(false);
-        vapi.stop();
     }
 
     useEffect(() => {
